@@ -8,6 +8,9 @@ studentRouter.get('/', async (req, res) => {
     await studentModel.find();
     res.json({ message: "hello" })
 })
+studentRouter.get('/test', async (req, res) => {
+    res.json({ message: "hello testing" })
+})
 
 studentRouter.post('/add', async (req, res) => {
     console.log(req.body)
