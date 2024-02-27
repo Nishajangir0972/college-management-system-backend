@@ -1,0 +1,8 @@
+# compiled output
+/node_modules
+/uploads/*
+!/uploads/.gitkeep
+
+.env
+.env.local
+.env.docker
