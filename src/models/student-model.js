@@ -11,7 +11,6 @@ const studentSchema = new mongoose.Schema(
         },
         username: {
             type: String,
-            required: true,
             unique: true,
         },
         fName: {
@@ -26,11 +25,11 @@ const studentSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        mobile1: {
+        mobile: {
             type: Number,
             required: true,
         },
-        mobile2: {
+        alternativeMobile: {
             type: Number,
         },
         dob: {
@@ -38,7 +37,7 @@ const studentSchema = new mongoose.Schema(
         },
         role:{
             type:Types.ObjectId,
-            default:'student',
+            default:'65cf15c84b357911ac08e58a',
         }
     },
     {
