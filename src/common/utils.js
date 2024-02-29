@@ -44,7 +44,6 @@ export function generateRandomString(length) {
 }
 
 export async function generateUniqueUsername(email, usernameFor) {
-    // const sanitize = (str) => str.replace(/[^a-zA-Z0-9]/g, '');
     const model = studentModel
     let username = email.split('@')[0];
 
@@ -54,14 +53,16 @@ export async function generateUniqueUsername(email, usernameFor) {
         return username.toLowerCase();
     }
 
-    let usernameTaken = true;
-    let newUsername = '';
+    let usernameTaken;
+    const checkUsername = (username) => {
+        return model.findOne({ username })
+    }
     do {
         let suffix = `${Math.floor(1 + Math.random() * 9)}`;       // If the username exists, generate a suffix
-        newUsername = `${username}${suffix}`;;
-        usernameTaken = await model.findOne({ username: newUsername })
+        username = `${username}${suffix}`;
+        usernameTaken = await checkUsername(username);
     } while (usernameTaken);
 
-    return newUsername.toLowerCase();
+    return username.toLowerCase();
 }
 
