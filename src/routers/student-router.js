@@ -3,11 +3,11 @@ import { body, validationResult } from "express-validator";
 import { handleException } from "../common/common-helpers.js";
 import studentService from "../services/student-service.js";
 import { generateRandomString, generateUniqueUsername, hashPassword } from "../common/utils.js";
-import authMiddleware from "../middlewares/middlewares.js";
 import { Types } from "mongoose";
 import { UnprocessableEntityException } from "../exceptions.js";
 import studentModel from "../models/student-model.js";
-import { isEmailUnique } from "../common/validators.js";
+import { isEmailUsed } from "../common/validators.js";
+import { sendEmail } from "../services/mail-service.js";
 
 const studentRouter = express.Router();
 // studentRouter.use(authMiddleware);
@@ -16,13 +16,19 @@ const studentRouter = express.Router();
 const validateStudentCreation = [
     body('firstName')
         .notEmpty().withMessage('First name is required'),
-    body('email')
-        .notEmpty().withMessage('Email is required')
-        .isEmail().withMessage('Invalid email format')
-        .custom(isEmailUnique).withMessage('Email is already taken'),
     body('mobile')
         .notEmpty().withMessage('Mobile Number is required')
         .isNumeric().withMessage('Mobile must be a number'),
+    body('email')
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .custom(async (email) => {
+            const isUsed = await isEmailUsed(email);
+            if (isUsed) {
+                throw new Error('Email is already taken');
+            }
+            return true;
+        }).withMessage('Email is already taken'),
 ];
 studentRouter.post('/create', validateStudentCreation, async (req, res) => {
     try {
@@ -31,10 +37,17 @@ studentRouter.post('/create', validateStudentCreation, async (req, res) => {
             return res.status(400).json({ data: null, errors: errors.array() });
         }
         let data = req.body;
-        data.password = await hashPassword(generateRandomString(10))
-        data.username = await generateUniqueUsername(data.email)
+        const randomPassword = generateRandomString(20)
+        const username = await generateUniqueUsername(data.email)
+        data.password = await hashPassword(randomPassword)
+        data.username = username;
         const newStudent = await studentService.createStudent(req.body)
-        res.status(201).json({ data: newStudent, message: 'Student created successfully' });
+        try {
+            await sendEmail(data.email, 'Welcome to College Portal', 'new-student-create', { name: data.firstName, username, password: randomPassword, collegePortalLink: 'www.tagore-pg-college.com' })
+        } catch (error) {
+            res.status(202).json({ data: newStudent, message: 'Student account created. Email sending is pending. Please check your email later.' })
+        }
+        res.status(202).json({ data: newStudent, message: 'Student created successfully' });
     } catch (error) {
         handleException(res, 'Failed to create student', error);
     }

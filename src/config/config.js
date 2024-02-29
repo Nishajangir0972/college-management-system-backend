@@ -14,6 +14,10 @@ export const ConfigData = {
             accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY || 604800,
         },
     },
+    mail: {
+        dsn: process.env.MAILER_DSN || 'hihihi',
+        from: process.env.MAIL_FROM || 'demo@gmail.com'
+    }
     // storage: {
     //     root: rootStorage,
     //     filesystems: {
