@@ -29,7 +29,7 @@ export class forbiddenException extends httpError {
   }
 }
 
-export class NotFfoundException extends httpError {
+export class NotFoundException extends httpError {
   constructor(message) {
     super();
     this.status = 404;

@@ -2,6 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import roleModel from '../models/role-model.js';
 import { handleException } from '../common/common-helpers.js';
+import { NotFoundException } from '../exceptions.js';
 
 const roleRouter = express.Router();
 
@@ -22,10 +23,10 @@ roleRouter.post('/create', validateCreateRole, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ data: null, errors: errors.array() });
         }
         const newRole = await roleModel.create(req.body);
-        res.status(201).json(newRole);
+        res.status(201).json({ data: newRole, message: 'Created role succesfully', errors: [] });
     } catch (error) {
         handleException(res, 'Failed to create role', error);
     }
@@ -40,12 +41,12 @@ roleRouter.patch('/update/:id', validateUpdateRole, async (req, res) => {
         }
         const updatedRole = await roleModel.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
-            runValidators: true,
+            runValidators: true
         });
         if (!updatedRole) {
-            return res.status(404).json({ errors: 'Role not found' });
+            throw new NotFoundException('Role not found')
         }
-        res.status(200).json(updatedRole);
+        res.status(202).json({ data: role, message: 'Role updated succesfully', errors: [] });
     } catch (error) {
         handleException(res, 'Failed to update role', error);
     }
@@ -55,7 +56,7 @@ roleRouter.patch('/update/:id', validateUpdateRole, async (req, res) => {
 roleRouter.get('/', async (req, res) => {
     try {
         const roles = await roleModel.find();
-        res.status(200).json(roles);
+        res.status(200).json({ data: roles, message: 'Fetched all roles succesfully', errors: [] });
     } catch (error) {
         handleException(res, 'Failed to fetch roles', error);
     }
@@ -66,20 +67,34 @@ roleRouter.get('/:id', async (req, res) => {
     try {
         const role = await roleModel.findById(req.params.id);
         if (!role) {
-            return res.status(404).json({ errors: 'Role not found' });
+            throw new NotFoundException('Role not found')
         }
-        res.status(200).json(role);
+        res.status(200).json({ data: role, message: 'Fetched role succesfully', errors: [] });
     } catch (error) {
         handleException(res, 'Failed to fetch role', error);
     }
 });
+
+// Get permissions for logged-in user
+roleRouter.get('/get-permissions/self', async (req, res) => {
+    try {
+        const roleId = req.user.role;
+        const role = await roleModel.findById(roleId);
+        if (!role) {
+            throw new NotFoundException('Role not found')
+        }
+        res.status(200).json({ data: role.permissions, message: 'Fetched permissions succesfully', errors: [] });
+    } catch (error) {
+        handleException(res, 'Failed to fetch role', error);
+    }
+})
 
 // Delete role by ID
 roleRouter.delete('/delete/:id', async (req, res) => {
     try {
         const deletedRole = await roleModel.findByIdAndDelete(req.params.id);
         if (!deletedRole) {
-            return res.status(404).json({ errors: 'Role not found' });
+            throw new NotFoundException('Role not found')
         }
         res.status(204).send();
     } catch (error) {
