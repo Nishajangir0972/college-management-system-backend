@@ -8,9 +8,11 @@ import { UnprocessableEntityException } from "../exceptions.js";
 import studentModel from "../models/student-model.js";
 import { isEmailUsed } from "../common/validators.js";
 import { sendEmail } from "../services/mail-service.js";
+import authMiddleware from "../middlewares/auth-middlewares.js";
+import roleMiddleware from "../middlewares/role-middleware.js";
 
 const studentRouter = express.Router();
-// studentRouter.use(authMiddleware);
+studentRouter.use(authMiddleware);
 
 
 const validateStudentCreation = [
@@ -30,7 +32,7 @@ const validateStudentCreation = [
             return true;
         }).withMessage('Email is already taken'),
 ];
-studentRouter.post('/create', validateStudentCreation, async (req, res) => {
+studentRouter.post('/create',roleMiddleware.bind(null,'student.create'), validateStudentCreation, async (req, res) => {
     try {
         const errors = validationResult(req);           // Check for validation errors
         if (!errors.isEmpty()) {

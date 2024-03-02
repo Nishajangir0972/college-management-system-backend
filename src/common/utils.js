@@ -24,15 +24,6 @@ export function createJwtToken(payload) {
     return jwt.sign(payload, secreatKey, { expiresIn });
 }
 
-export function verifyJwtToken(token) {
-    try {
-        const decoded = jwt.verify(token, secret);
-        return decoded;
-    } catch (error) {
-        throw new UnauthorisedException('hi')
-    }
-}
-
 // *********** Common utilities Functions*************
 export function generateRandomString(length) {
     if (length <= 0) {
