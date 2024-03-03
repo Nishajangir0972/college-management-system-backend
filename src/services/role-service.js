@@ -1,4 +1,4 @@
-import roleModel from "../models/role-model";
+import roleModel from "../models/role-model.js";
 
 class RoleService {
     constructor() { }
@@ -12,7 +12,7 @@ class RoleService {
         return roleModel.findById(id);
     }
 
-    findByUsername(name) {
+    findByname(name) {
         return roleModel.findOne({ name });
     }
 

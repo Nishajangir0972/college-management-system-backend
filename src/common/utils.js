@@ -20,7 +20,7 @@ export async function comparePasswords(plainPassword, hashedPassword) {
 // *********** JWT Utilities Functions*************
 export function createJwtToken(payload) {
     const secreatKey = ConfigData.auth.jwt.secretKey;
-    const expiresIn = ConfigData.auth.jwt.accessTokenExpiry;
+    const expiresIn = `${ConfigData.auth.jwt.accessTokenExpiry}s`;
     return jwt.sign(payload, secreatKey, { expiresIn });
 }
 
