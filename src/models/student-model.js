@@ -13,7 +13,7 @@ const studentSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
-        fName: {
+        fathersName: {
             type: String,
         },
         email: {

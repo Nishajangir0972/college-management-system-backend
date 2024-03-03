@@ -2,18 +2,32 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import roleModel from '../models/role-model.js';
 import { handleException } from '../common/common-helpers.js';
-import { NotFoundException } from '../exceptions.js';
+import { NotFoundException, UnprocessableEntityException } from '../exceptions.js';
+import { isRoleExists } from '../common/validators.js';
+import { Types } from 'mongoose';
+import roleService from '../services/role-service.js';
+import authMiddleware from '../middlewares/auth-middlewares.js';
 
 const roleRouter = express.Router();
+roleRouter.use(authMiddleware)
 
 const validateCreateRole = [
-    body('name').notEmpty().withMessage('Name is required').isString(),
+    body('name')
+        .isString()
+        .notEmpty().withMessage('Name is required')
+        .custom(async (name) => {
+            const isUsed = await isRoleExists(name);
+            if (isUsed) {
+                throw new Error('Role already exists');
+            }
+            return true;
+        }).withMessage('Role already exists'),
     body('isSuperAdmin').optional().isBoolean().withMessage('isSuperAdmin must be a boolean'),
     body('permissions').optional().isArray().withMessage('Permissions must be an array'),
 ];
 
 const validateUpdateRole = [
-    body('name').optional().isString(),
+    body('name').optional().notEmpty().withMessage('Name is required').isString(),
     body('isSuperAdmin').optional().isBoolean().withMessage('isSuperAdmin must be a boolean'),
     body('permissions').optional().isArray().withMessage('Permissions must be an array'),
 ];
@@ -33,18 +47,30 @@ roleRouter.post('/create', validateCreateRole, async (req, res) => {
 });
 
 // Update role by ID
-roleRouter.patch('/update/:id', validateUpdateRole, async (req, res) => {
+roleRouter.patch('/update/:roleId', validateUpdateRole, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
+        }
+        let roleId = req.params.roleId;
+        try {
+            roleId = new Types.ObjectId(roleId);
+        } catch (error) {
+            throw new UnprocessableEntityException({ path: 'roleId', msg: 'Invalid id' })
+        }
+        if (req.body?.name) {
+            const role = await roleService.findByname(req.body.name)
+            if (role && role._id.toString() !== roleId.toString()) {
+                throw new UnprocessableEntityException({ path: 'name', msg: 'Role already exists' })
+            }
         }
         const updatedRole = await roleModel.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
             runValidators: true
         });
         if (!updatedRole) {
-            throw new NotFoundException('Role not found')
+            return res.status(404).json({ data: null, message: 'Role not found', errors: 'Role not found' });
         }
         res.status(202).json({ data: role, message: 'Role updated succesfully', errors: [] });
     } catch (error) {
@@ -63,9 +89,15 @@ roleRouter.get('/', async (req, res) => {
 });
 
 // Get role by ID
-roleRouter.get('/:id', async (req, res) => {
+roleRouter.get('/:roleId', async (req, res) => {
     try {
-        const role = await roleModel.findById(req.params.id);
+        let roleId = req.params.roleId
+        try {
+            roleId = new Types.ObjectId(roleId);
+        } catch (error) {
+            throw new UnprocessableEntityException({ path: 'roleId', msg: 'Invalid id' })
+        }
+        const role = await roleModel.findById(req.params.roleId);
         if (!role) {
             throw new NotFoundException('Role not found')
         }
@@ -79,6 +111,7 @@ roleRouter.get('/:id', async (req, res) => {
 roleRouter.get('/get-permissions/self', async (req, res) => {
     try {
         const roleId = req.user.role;
+        console.log();
         const role = await roleModel.findById(roleId);
         if (!role) {
             throw new NotFoundException('Role not found')
@@ -90,9 +123,15 @@ roleRouter.get('/get-permissions/self', async (req, res) => {
 })
 
 // Delete role by ID
-roleRouter.delete('/delete/:id', async (req, res) => {
+roleRouter.delete('/delete/:roleId', async (req, res) => {
     try {
-        const deletedRole = await roleModel.findByIdAndDelete(req.params.id);
+        let roleId = req.params.roleId
+        try {
+            roleId = new Types.ObjectId(roleId);
+        } catch (error) {
+            throw new UnprocessableEntityException({ path: 'roleId', msg: 'Invalid id' })
+        }
+        const deletedRole = await roleModel.findByIdAndDelete(req.params.roleId);
         if (!deletedRole) {
             throw new NotFoundException('Role not found')
         }
