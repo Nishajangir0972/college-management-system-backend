@@ -13,7 +13,7 @@ const studentSchema = new mongoose.Schema(
             type: String,
             unique: true,
         },
-        fName: {
+        fathersName: {
             type: String,
         },
         email: {
@@ -35,9 +35,17 @@ const studentSchema = new mongoose.Schema(
         dob: {
             type: Date,
         },
-        role:{
-            type:Types.ObjectId,
-            default:'65cf15c84b357911ac08e58a',
+        role: {
+            type: Types.ObjectId,
+            default: '65cf15c84b357911ac08e58a',
+        },
+        department: {
+            type: Types.ObjectId,
+            required: true
+        },
+        class: {
+            type: Types.ObjectId,
+            required: true
         }
     },
     {

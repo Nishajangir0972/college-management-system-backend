@@ -8,9 +8,12 @@ import { UnprocessableEntityException } from "../exceptions.js";
 import studentModel from "../models/student-model.js";
 import { isEmailUsed } from "../common/validators.js";
 import { sendEmail } from "../services/mail-service.js";
+import authMiddleware from "../middlewares/auth-middlewares.js";
+import roleMiddleware from "../middlewares/role-middleware.js";
+import roleService from "../services/role-service.js";
 
 const studentRouter = express.Router();
-// studentRouter.use(authMiddleware);
+studentRouter.use(authMiddleware);
 
 
 const validateStudentCreation = [
@@ -19,6 +22,12 @@ const validateStudentCreation = [
     body('mobile')
         .notEmpty().withMessage('Mobile Number is required')
         .isNumeric().withMessage('Mobile must be a number'),
+    body('class')
+        .notEmpty().withMessage('Class is required')
+        .isMongoId().withMessage('Must be a valid Class'),
+    body('department')
+        .notEmpty().withMessage('Department is required')
+        .isMongoId().withMessage('Must be a valid department'),
     body('email')
         .notEmpty().withMessage('Email is required')
         .isEmail().withMessage('Invalid email format')
@@ -30,7 +39,7 @@ const validateStudentCreation = [
             return true;
         }).withMessage('Email is already taken'),
 ];
-studentRouter.post('/create', validateStudentCreation, async (req, res) => {
+studentRouter.post('/create', roleMiddleware.bind(null, 'student.create'), validateStudentCreation, async (req, res) => {
     try {
         const errors = validationResult(req);           // Check for validation errors
         if (!errors.isEmpty()) {
@@ -41,13 +50,15 @@ studentRouter.post('/create', validateStudentCreation, async (req, res) => {
         const username = await generateUniqueUsername(data.email)
         data.password = await hashPassword(randomPassword)
         data.username = username;
+        const studentRoleId = await roleService.findByname('STUDENT')
+        data.role = studentRoleId._id
         const newStudent = await studentService.createStudent(req.body)
         try {
             await sendEmail(data.email, 'Welcome to College Portal', 'new-student-create', { name: data.firstName, username, password: randomPassword, collegePortalLink: 'www.tagore-pg-college.com' })
         } catch (error) {
-            res.status(202).json({ data: newStudent, message: 'Student account created. Email sending is pending. Please check your email later.' })
+            res.status(201).json({ data: newStudent, message: 'Student account created. Email sending is pending. Please check your email later.' })
         }
-        res.status(202).json({ data: newStudent, message: 'Student created successfully' });
+        res.status(201).json({ data: newStudent, message: 'Student created successfully' });
     } catch (error) {
         handleException(res, 'Failed to create student', error);
     }
@@ -96,8 +107,9 @@ studentRouter.patch('/update/:id', validateStudentCreation, async (req, res) => 
             return res.status(400).json({ data: null, errors: errors.array() });
         }
         let data = req.body;
+        delete data.email
         delete data.password;
-        data.username;
+        delete data.username;
         const updatedStudent = await studentService.createStudent(req.body)
         res.status(202).json({ data: updatedStudent, message: 'Student updated successfully' });
     } catch (error) {

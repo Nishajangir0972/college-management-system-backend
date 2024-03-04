@@ -7,7 +7,6 @@ function authMiddleware(req, res, next) {
     token = token.substring(7);
     try {
         const decoded = jwt.verify(token, ConfigData.auth.jwt.secretKey);
-        console.log(decoded)
         req.user = decoded;
         next();
     } catch (error) {
