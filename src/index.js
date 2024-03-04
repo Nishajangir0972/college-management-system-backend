@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
     })
 })
 
-
 connection
     .then(() => {
         app.listen(ConfigData.port, () => console.log(`Server has been started on Port : ${ConfigData.port}`))
