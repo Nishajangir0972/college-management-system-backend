@@ -10,7 +10,7 @@ To get started with the project, follow these simple steps:
 2. Install dependencies by running `npm install`.
 3. Rename `.env.dist` file to `.env` and configure the environment variables as needed.
 4. Seed the database with initial data by running `node seed.js`.
-5. Start the server using the command: `nodemon index.js`.
+5. Start the server using the command: `nodemon` or `node src/index.js`.
 
 ## Features
 
@@ -18,8 +18,6 @@ To get started with the project, follow these simple steps:
 - **Course Management**: Create, update, and delete courses offered by the college.
 - **Attendance Tracking**: Record and manage student attendance for various courses.
 - **Grades and Results**: Manage student grades, generate reports, and view academic performance.
-- **Resource Management**: Upload and manage educational resources such as documents, lecture slides, etc.
-- **Communication**: Facilitate communication between students, faculty, and staff through messaging features.
 - **Authentication and Authorization**: Secure access to resources through authentication and role-based authorization.
 
 ## Tech Stack
@@ -39,13 +37,10 @@ Contributions are welcome! If you have any suggestions, bug reports, or feature 
 
 ### Contributors
 
-- [GitHub Username 1](https://github.com/ajayshekhawat1803)
-- [GitHub Username 2](https://github.com/Nishajangir0972)
-- [GitHub Username 2](https://github.com/omendershekhawat)
+- [GitHub Ajay Shekhawat](https://github.com/ajayshekhawat1803)
+- [GitHub Nisha Jangir](https://github.com/Nishajangir0972)
+- [GitHub Omender Shekhawat](https://github.com/omendershekhawat)
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
 
 ## Required CSS
 
