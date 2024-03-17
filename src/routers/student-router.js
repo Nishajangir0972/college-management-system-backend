@@ -136,4 +136,23 @@ studentRouter.delete('/delete/:studentId', async (req, res) => {
     }
 })
 
+const profileUpdateValidator = [
+
+]
+studentRouter.patch('/update-profile', profileUpdateValidator, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ data: null, errors: errors.array() });
+    }
+    console.log("reqaayi");
+})
+
+
+const loginCredentialValidator = [
+    
+]
+studentRouter.patch('/update-login-credentials', async (req, res) => {
+    console.log("reqaayi");
+})
+
 export default studentRouter;

@@ -11,9 +11,9 @@ const mainRouter = express.Router();
 mainRouter.use('/auth', authRouter)
 mainRouter.use('/student', studentRouter);
 mainRouter.use('/employee', employeeRouter);
-mainRouter.use('/role',roleRouter);
-mainRouter.use('/department',departmentRouter);
-mainRouter.use('/class',classRouter);
+mainRouter.use('/role', roleRouter);
+mainRouter.use('/department', departmentRouter);
+mainRouter.use('/class', classRouter);
 // Use other routers as needed
 
 export default mainRouter;

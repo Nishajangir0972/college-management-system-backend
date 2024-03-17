@@ -13,15 +13,19 @@ export const ConfigData = {
             secretKey: process.env.JWT_SECRET_KEY || 'demo',
             accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY || 604800,
         },
+        resetPasswordTokenExpiry: process.env.RESET_PASSWORD_TOKEN_EXPIRY || 604800
     },
     mail: {
         dsn: process.env.MAILER_DSN || 'hihihi',
         from: process.env.MAIL_FROM || 'demo@gmail.com'
-    }
+    },
     // storage: {
     //     root: rootStorage,
     //     filesystems: {
     //         tmp: path.join(rootStorage, 'tmp'),
     //     },
     // },
+    frontend: {
+        baseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:3000'
+    }
 }
