@@ -37,6 +37,6 @@ Contributions are welcome! If you have any suggestions, bug reports, or feature 
 
 ### Contributors
 
-- [GitHub Ajay Shekhawat](https://github.com/ajayshekhawat1803)
-- [GitHub Nisha Jangir](https://github.com/Nishajangir0972)
-- [GitHub Omender Shekhawat](https://github.com/omendershekhawat)
+- [Ajay Shekhawat](https://github.com/ajayshekhawat1803)
+- [Nisha Jangir](https://github.com/Nishajangir0972)
+- [Omender Shekhawat](https://github.com/omendershekhawat)
