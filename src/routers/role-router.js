@@ -21,13 +21,14 @@ const validateCreateRole = [
                 throw new Error('Role already exists');
             }
             return true;
-        }).withMessage('Role already exists'),
+        }).withMessage('Role already exists')
+        .toUpperCase(),
     body('isSuperAdmin').optional().isBoolean().withMessage('isSuperAdmin must be a boolean'),
     body('permissions').optional().isArray().withMessage('Permissions must be an array'),
 ];
 
 const validateUpdateRole = [
-    body('name').optional().notEmpty().withMessage('Name is required').isString(),
+    body('name').optional().notEmpty().withMessage('Name is required').isString().toUpperCase(),
     body('isSuperAdmin').optional().isBoolean().withMessage('isSuperAdmin must be a boolean'),
     body('permissions').optional().isArray().withMessage('Permissions must be an array'),
 ];
