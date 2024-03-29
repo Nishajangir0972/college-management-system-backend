@@ -1,5 +1,5 @@
 import express from "express";
-import { isDepartmentExists } from "../common/validators.js";
+import { isDepartmentNameExists } from "../common/validators.js";
 import departmentService from "../services/department-service.js";
 import { handleException } from "../common/common-helpers.js";
 import authMiddleware from "../middlewares/auth-middlewares.js";
@@ -16,7 +16,7 @@ const validateDepartmentCreation = [
     body('name')
         .notEmpty().withMessage('Department name is required')
         .custom(async (name) => {
-            const isAlreadyExists = await isDepartmentExists(name);
+            const isAlreadyExists = await isDepartmentNameExists(name);
             if (isAlreadyExists) {
                 throw new Error('Department already exists')
             }

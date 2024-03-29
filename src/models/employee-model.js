@@ -43,6 +43,9 @@ const employeeSchema = new mongoose.Schema(
         photo: {
             type: String,
         },
+        bio: {
+            type: String,
+        },
         idProof: {
             type: String,
         },
