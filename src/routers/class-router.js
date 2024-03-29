@@ -6,7 +6,7 @@ import roleMiddleware from "../middlewares/role-middleware.js";
 import classService from "../services/class-service.js";
 import { handleException } from "../common/common-helpers.js";
 import { UnprocessableEntityException } from "../exceptions.js";
-import { Types } from "mongoose";
+import { Types, isValidObjectId } from "mongoose";
 import departmentService from "../services/department-service.js";
 
 const classRouter = express.Router();
@@ -72,9 +72,8 @@ classRouter.get('/getall', async (req, res) => {
 classRouter.get('/get-by-department/:departmentId', async (req, res) => {
     try {
         let departmentId = req.params.departmentId;
-        try {
-            departmentId = new Types.ObjectId(departmentId);
-        } catch (error) {
+        const isValidId = isValidObjectId(departmentId)
+        if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'departmentId', msg: 'Invalid id' })
         }
         const classes = await classService.findByDepartmentId(req.params.departmentId)
@@ -100,9 +99,8 @@ classRouter.patch('/update/:classId', validateClassUpdate, async (req, res) => {
             return res.status(400).json({ data: null, errors: errors.array() });
         }
         let classId = req.params.classId;
-        try {
-            classId = new Types.ObjectId(classId);
-        } catch (error) {
+        const isValidId = isValidObjectId(classId)
+        if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'classId', msg: 'Invalid id' })
         }
         const result = await classService.findByName(req.body.name)
@@ -123,11 +121,10 @@ classRouter.patch('/update/:classId', validateClassUpdate, async (req, res) => {
 classRouter.delete('/delete/:classId', async (req, res) => {
     try {
         let classId = req.params.classId;
-        try {
-            classId = new Types.ObjectId(classId);
-        } catch (error) {
+        const isValidId = isValidObjectId(classId)
+        if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'classId', msg: 'Invalid id' })
-        }
+        }        
         const result = await classService.deleteClass(classId);
         if (result) {
             res.status(202).json({ data: result, message: 'Class deleted', errors: [] });

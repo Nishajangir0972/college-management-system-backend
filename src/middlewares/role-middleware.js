@@ -6,6 +6,7 @@ async function roleMiddleware(permission, req, res, next) {
     try {
         const roleId = req.user.role;
         const role = await roleModel.findById(roleId);
+        console.log('req', req.user);
         if (role) {
             if (role.isSuperAdmin) {
                 return next();
