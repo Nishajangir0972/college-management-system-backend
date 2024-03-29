@@ -7,7 +7,7 @@ import { comparePasswords, createJwtToken, hashPassword } from "../common/utils.
 import { ConfigData } from "../config/config.js";
 import employeeService from "../services/employee-service.js";
 import userTokenService from "../services/user-token-service.js";
-import { isEmailUsed } from "../common/validators.js";
+import { isEmailUsed, isEmployeeEmailUsed } from "../common/validators.js";
 import { userTokenTypes } from "../models/user-token-model.js";
 import { sendEmail } from "../services/mail-service.js";
 
@@ -86,7 +86,7 @@ authRouter.post('/employee/login',
         }
     })
 
-// For Reset-Password Student
+/*---------------For Password Reset Student--------------------*/
 authRouter.post(
     '/student/reset-password',
     [
@@ -101,7 +101,7 @@ authRouter.post(
     ],
     async (req, res) => {
         try {
-            const errors = validationResult(req);  // Check for validation errors
+            const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res
                     .status(400)
@@ -111,7 +111,7 @@ authRouter.post(
             const generatedToken = await userTokenService.saveToken(user._id.toString(), userTokenTypes.RESET_PASSWORD);
             try {
                 await sendEmail(user.email, 'Reset-Password', 'reset-password', { name: user.firstName, resetPasswordLink: `${ConfigData.frontend.baseUrl}/student/reset-password/${generatedToken.token}` })
-                res.status(202).json({ data: null, message: 'Password reset email sent' })
+                res.status(200).json({ data: null, message: 'Password reset email sent' })
             } catch (error) {
                 await userTokenService.delete(generatedToken.token)
                 res.status(500).json({ data: null, message: 'Failed to send reset password email' })
@@ -156,7 +156,84 @@ authRouter.post(
             await userTokenService.delete(token);
             return res
                 .status(202)
-                .json({ data: null, message: 'Password Successfully Updated'});
+                .json({ data: null, message: 'Password Successfully Updated' });
+        }
+        catch (error) {
+            handleException(res, 'Request Failed', error);
+        }
+    })
+
+/*---------------For Password Reset Employee--------------------*/
+authRouter.post(
+    '/employee/reset-password',
+    [
+        body('email').notEmpty().withMessage('Email is required')
+            .custom(async (email) => {
+                const isUsed = await isEmployeeEmailUsed(email);
+                if (!isUsed) {
+                    throw new Error('No User Exists with this email');
+                }
+                return true;
+            }).withMessage('No Employee found with this email'),
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);  // Check for validation errors
+            if (!errors.isEmpty()) {
+                return res
+                    .status(400)
+                    .json({ data: null, errors: errors.array() });
+            }
+            const user = await employeeService.findByEmail(req.body.email);
+            const generatedToken = await userTokenService.saveToken(user._id.toString(), userTokenTypes.RESET_PASSWORD );
+            try {
+                await sendEmail(user.email, 'Reset-Password', 'reset-password', { name: user.firstName, resetPasswordLink: `${ConfigData.frontend.baseUrl}/employee/reset-password/${generatedToken.token}` })
+                res.status(200).json({ data: null, message: 'Password reset email sent', errors: [] })
+            } catch (error) {
+                await userTokenService.delete(generatedToken.token)
+                res.status(500).json({ data: null, message: 'Failed to send reset password email', errors: [] })
+            }
+        }
+        catch (error) {
+            handleException(res, 'Request Failed', error);
+        }
+    })
+
+authRouter.post(
+    '/employee/reset-password/:resetPasswordToken',
+    [
+        body('newPassword').notEmpty().withMessage('New password cannot be empty'),
+        body('cnfPassword').notEmpty().withMessage('Confirm password must not be empty'),
+        body('cnfPassword').custom((inp, meta) => {
+            if (
+                meta.req.body.newPassword
+                && meta.req.body.cnfPassword
+                && meta.req.body.newPassword !== meta.req.body.cnfPassword) {
+                return false;
+            }
+            return true;
+        }).withMessage('Confirm Password must be similar to new password')
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);  // Check for validation errors
+            if (!errors.isEmpty()) {
+                return res
+                    .status(400)
+                    .json({ data: null, errors: errors.array() });
+            }
+            const token = req.params.resetPasswordToken;
+            const tokenDocument = await userTokenService.findByToken(token);
+            if (!tokenDocument) {
+                throw new UnprocessableEntityException('Either reset password link has expired or is invalid.')
+            }
+            const user = await employeeService.findById(tokenDocument.user);
+            const newHashedPassword = await hashPassword(req.body.newPassword);
+            await employeeService.updateEmployee(user._id.toString(), { password: newHashedPassword });
+            await userTokenService.delete(token);
+            return res
+                .status(202)
+                .json({ data: null, message: 'Password Successfully Updated', errors: []  });
         }
         catch (error) {
             handleException(res, 'Request Failed', error);

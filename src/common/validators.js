@@ -3,9 +3,15 @@ import courseService from "../services/course-service.js";
 import departmentService from "../services/department-service.js";
 import roleService from "../services/role-service.js";
 import studentService from "../services/student-service.js";
+import employeeService from "../services/employee-service.js";
 
 export const isEmailUsed = async (email) => {
     const existingStudent = await studentService.findByEmail(email);
+    return existingStudent ? true : false;
+}
+
+export const isEmployeeEmailUsed = async (email) => {
+    const existingStudent = await employeeService.findByEmail(email);
     return existingStudent ? true : false;
 }
 
