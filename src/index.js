@@ -13,7 +13,7 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.json());
 
 app.use(mainRouter);
-app.use('/documentation', swaggerUi.serve, swaggerUi.setup(apiDocumentation));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiDocumentation));
 
 app.get('/', (req, res) => {
     res.json({

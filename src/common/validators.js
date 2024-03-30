@@ -25,8 +25,13 @@ export const isDepartmentIdExists = async (id) => {
     return existingDepartment ? true : false;
 }
 
-export const isClassExists = async (name) => {
+export const isClassNameExists = async (name) => {
     const existingClass = await classService.findByName(name)
+    return existingClass ? true : false;
+}
+
+export const isClassIdExists = async (id) => {
+    const existingClass = await classService.findById(id)
     return existingClass ? true : false;
 }
 

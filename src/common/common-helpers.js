@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { UnprocessableEntityException } from '../exceptions.js';
 
 export const handleException = (res, message, error) => {
     const errors = Array.isArray(error.message)
@@ -10,6 +11,22 @@ export const handleException = (res, message, error) => {
         .status(error.status || 500)
         .json({ data: null, message: message, errors });
 };
+
+export const getPaginationQuery = (query) => {
+    let { page = 1, limit = 50, sort = [{ field: 'createdAt', direction: 1 }] } = query;
+    console.log('-------------sort',sort);
+    if (sort) {
+        sort.map((sortObject) => {
+            if (!sortObject.field || !sortObject.direction) {
+                throw new UnprocessableEntityException('Invalid query passed')
+            }
+        })
+        sort = [{ field: 'createdAt', direction: 1 }]
+    }
+    page = Number(page);
+    limit = Number(limit);
+    return { page, limit, sort };
+}
 
 
 export const getDefaultApplicationPermissions = () => {
@@ -31,7 +48,7 @@ export const updateDefaultApplicationPermissions = (data) => {
         if (err) {
             throw new Error('Failed to write data in permission json file')
         }
-        return  null;
+        return null;
     });
 }
 

@@ -1,4 +1,5 @@
-import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth.js";
+import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
+import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
 const apiDocumentation = {
     openapi: '3.0.1',
@@ -27,6 +28,7 @@ const apiDocumentation = {
         //     description: 'Production Server',
         //   },
     ],
+    apis: ['../index.js'],
     tags: [
         {
             name: 'Auth',
@@ -71,7 +73,21 @@ const apiDocumentation = {
             post: employeePasswordResetResponse,
         },
         /*-----------------------Student-Section---------------------------*/
-
+        '/student/create': {
+            post: createStudentResponse,
+        },
+        '/student/get/{studentId}': {
+            get: getStudentByIdResponse,
+        },
+        '/student/getall': {
+            get: getAllStudentsResponse,
+        },
+        '/student/update/{studentId}': {
+            patch: updateStudentByIdResponse,
+        },
+        '/student/delete/{studentId}': {
+            delete: deleteStudentByIdResponse,
+        },
     },
     components: {
         securitySchemes: {
@@ -83,8 +99,9 @@ const apiDocumentation = {
         },
         schemas: {
             /*-----------------------Auth-Section---------------------------*/
-            AuthLoginBody, AuthEmployeeLoginBody, passwordResetRequestBody, resetPasswordBody
+            AuthLoginBody, AuthEmployeeLoginBody, passwordResetRequestBody, resetPasswordBody,
             /*-----------------------Student-Section---------------------------*/
+            createStudentBody, updateStudentDataByIdBody,
         },
     },
 };

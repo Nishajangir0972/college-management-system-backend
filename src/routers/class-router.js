@@ -1,6 +1,6 @@
 import express from "express";
 import authMiddleware from "../middlewares/auth-middlewares.js";
-import { isClassExists } from "../common/validators.js";
+import { isClassNameExists } from "../common/validators.js";
 import { body, validationResult } from "express-validator";
 import roleMiddleware from "../middlewares/role-middleware.js";
 import classService from "../services/class-service.js";
@@ -19,7 +19,7 @@ const validateClassCreation = [
     body('name')
         .notEmpty().withMessage('Class name is required')
         .custom(async (name) => {
-            const isAlreadyExists = await isClassExists(name);
+            const isAlreadyExists = await isClassNameExists(name);
             if (isAlreadyExists) {
                 throw new Error('Class already exists')
             }
