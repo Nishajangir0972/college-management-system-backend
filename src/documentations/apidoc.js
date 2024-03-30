@@ -1,5 +1,6 @@
 import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
+import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
 const apiDocumentation = {
@@ -108,6 +109,25 @@ const apiDocumentation = {
         '/class/delete/{classId}': {
             delete: deleteClassByIdResponse,
         },
+        /*-----------------------Roles-Section---------------------------*/
+        '/role/create': {
+            post: createRoleResponse,
+        },
+        '/role/{roleId}': {
+            get: getRoleByIdResponse,
+        },
+        '/role/': {
+            get: getAllRolesResponse,
+        },
+        '/role/get-permissions/self': {
+            get: getSelfPermissionsResponse,
+        },
+        '/role/update/{roleId}': {
+            patch: updateRoleByIdResponse,
+        },
+        '/role/delete/{roleId}': {
+            delete: deleteRoleByIdResponse,
+        },
     },
     components: {
         securitySchemes: {
@@ -124,6 +144,8 @@ const apiDocumentation = {
             createStudentBody, updateStudentDataByIdBody,
             /*-----------------------Class-Section---------------------------*/
             createClassBody,
+            /*-----------------------Roles-Section---------------------------*/
+            createRoleBody,
         },
     },
 };

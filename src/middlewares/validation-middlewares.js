@@ -1,7 +1,8 @@
 import { body } from "express-validator";
-import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isEmailUsed } from "../common/validators.js";
+import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isEmailUsed, isRoleNameExists } from "../common/validators.js";
 import studentService from "../services/student-service.js";
 import classModel from "../models/class-model.js";
+import roleService from "../services/role-service.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -127,6 +128,8 @@ export const validateClassUpdate = [
             return true;
         }).withMessage(`Department doesn't exists`),
 ];
+
+
 // ***********************FOR-COURSES-ROUTER************************** //
 export const validatecourseCreation = [
     body('department')
@@ -154,4 +157,70 @@ export const validatecourseCreation = [
         .notEmpty().withMessage('Course description is required'),
     body('opportunities')
         .isArray().withMessage('Must be valid'),
+];
+
+
+// ***********************FOR-ROLES-ROUTER************************** //
+export const validateCreateRole = [
+    body('name')
+        .isString()
+        .notEmpty().withMessage('Name is required')
+        .custom(async (name) => {
+            const isUsed = await isRoleNameExists(name.toUpperCase());
+            if (isUsed) {
+                throw new Error('Role already exists');
+            }
+            return true;
+        }).withMessage('Role already exists')
+        .toUpperCase(),
+    body('isSuperAdmin')
+        .optional()
+        .isBoolean()
+        .withMessage('isSuperAdmin must be a boolean'),
+    body('permissions')
+        .optional()
+        .isArray()
+        .withMessage('Permissions must be an array')
+        .custom((permissions, { req }) => {
+            let p = [];
+            permissions.map((value) => {
+                if (p.includes(value)) {
+                    throw new Error('Duplicate permissions');
+                }
+                p.push(value);
+            })
+            return true;
+        }).withMessage('Duplicate permissions assigned'),
+];
+
+export const validateUpdateRole = [
+    body('name')
+        .isString()
+        .notEmpty().withMessage('Name is required')
+        .custom(async (name, { req }) => {
+            const isUsed = await roleService.findByname(name.toUpperCase());
+            if (isUsed && isUsed?._id.toString() !== req.params.roleId) {
+                throw new Error('Role already exists');
+            }
+            return true;
+        }).withMessage('Role already exists')
+        .toUpperCase(),
+    body('isSuperAdmin')
+        .optional()
+        .isBoolean()
+        .withMessage('isSuperAdmin must be a boolean'),
+    body('permissions')
+        .optional()
+        .isArray()
+        .withMessage('Permissions must be an array')
+        .custom((permissions) => {
+            let p = [];
+            permissions.map((value) => {
+                if (p.includes(value)) {
+                    throw new Error('Duplicate permissions');
+                }
+                p.push(value);
+            })
+            return true;
+        }).withMessage('Duplicate permissions assigned'),
 ];
