@@ -1,6 +1,7 @@
 import { body } from "express-validator";
-import { isClassIdExists, isCourseNameExists, isDepartmentIdExists, isEmailUsed } from "../common/validators.js";
+import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isEmailUsed } from "../common/validators.js";
 import studentService from "../services/student-service.js";
+import classModel from "../models/class-model.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -78,6 +79,53 @@ export const validateStudentDataUpdation = [
             }
             return true;
         }).withMessage('Email is already taken'),
+];
+
+
+// ***********************FOR-Classes-ROUTER************************** //
+export const validateClassCreation = [
+    body('department')
+        .notEmpty().withMessage('Department is required')
+        .isMongoId().withMessage('Must be a valid department')
+        .custom(async (value) => {
+            const departmentExists = await isDepartmentIdExists(value);
+            if (!departmentExists) {
+                throw new Error('Department doesnt exists');
+            }
+            return true;
+        }).withMessage(`Department doesn't exists`),
+    body('name')
+        .notEmpty().withMessage('Class name is required')
+        .toUpperCase()
+        .custom(async (name) => {
+            const isAlreadyExists = await isClassNameExists(name);
+            if (isAlreadyExists) {
+                throw new Error('Class already exists')
+            }
+            return true;
+        }).withMessage('Class already exists'),
+];
+export const validateClassUpdate = [
+    body('name')
+        .notEmpty().withMessage('Class name is required')
+        .toUpperCase()
+        .custom(async (name, { req }) => {
+            const isAlreadyExists = await classModel.findOne({ name });
+            if (isAlreadyExists && isAlreadyExists?._id?.toString() !== req.params.classId) {
+                throw new Error('Class already exists')
+            }
+            return true;
+        }).withMessage('Class already exists'),
+    body('department')
+        .notEmpty().withMessage('Department is required')
+        .isMongoId().withMessage('Must be a valid department')
+        .custom(async (value) => {
+            const departmentExists = await isDepartmentIdExists(value);
+            if (!departmentExists) {
+                throw new Error('Department doesnt exists');
+            }
+            return true;
+        }).withMessage(`Department doesn't exists`),
 ];
 // ***********************FOR-COURSES-ROUTER************************** //
 export const validatecourseCreation = [

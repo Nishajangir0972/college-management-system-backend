@@ -1,4 +1,5 @@
 import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
+import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
 const apiDocumentation = {
@@ -88,6 +89,25 @@ const apiDocumentation = {
         '/student/delete/{studentId}': {
             delete: deleteStudentByIdResponse,
         },
+        /*-----------------------Classes-Section---------------------------*/
+        '/class/create': {
+            post: createClassResponse,
+        },
+        '/class/get/{classId}': {
+            get: getClassByIdResponse,
+        },
+        '/class/getall': {
+            get: getAllClassesResponse,
+        },
+        '/class/get-by-department/{departmentId}': {
+            get: getAllClassesByDepartmentResponse,
+        },
+        '/class/update/{classId}': {
+            patch: updateClassByIdResponse,
+        },
+        '/class/delete/{classId}': {
+            delete: deleteClassByIdResponse,
+        },
     },
     components: {
         securitySchemes: {
@@ -102,6 +122,8 @@ const apiDocumentation = {
             AuthLoginBody, AuthEmployeeLoginBody, passwordResetRequestBody, resetPasswordBody,
             /*-----------------------Student-Section---------------------------*/
             createStudentBody, updateStudentDataByIdBody,
+            /*-----------------------Class-Section---------------------------*/
+            createClassBody,
         },
     },
 };

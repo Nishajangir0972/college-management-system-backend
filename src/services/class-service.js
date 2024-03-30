@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import classModel from "../models/class-model.js";
 
 class StudentClassService {
@@ -12,6 +13,62 @@ class StudentClassService {
         return classModel.findById(id);
     }
 
+    async findClassDataById(id) {
+        const pipeline = [
+            {
+                '$match': {
+                    '_id': new Types.ObjectId(id)
+                }
+            }, {
+                '$lookup': {
+                    'from': 'departments',
+                    'localField': 'department',
+                    'foreignField': '_id',
+                    'as': 'department'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$department',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$project': {
+                    'department.createdAt': 0,
+                    'department.updatedAt': 0,
+                }
+            }
+        ];
+        const classes = await classModel.aggregate(pipeline).exec();
+        return classes[0];
+    }
+
+    async findAllClassesData() {
+        const pipeline = [
+            {
+                '$lookup': {
+                    'from': 'departments',
+                    'localField': 'department',
+                    'foreignField': '_id',
+                    'as': 'department'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$department',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$project': {
+                    'department.createdAt': 0,
+                    'department.updatedAt': 0,
+                }
+            }, {
+                $sort: { name: 1 }
+            }
+        ];
+        const classes = await classModel.aggregate(pipeline).exec();
+        return classes;
+    }
+
     findByName(name) {
         return classModel.findOne({ name });
     }
@@ -20,8 +77,36 @@ class StudentClassService {
         return classModel.find({});
     }
 
-    findByDepartmentId(id) {
-        return classModel.find({ department: id });
+   async findByDepartmentId(id) {
+        const pipeline = [
+            {
+                '$match': {
+                    'department': new Types.ObjectId(id)
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'departments',
+                    'localField': 'department',
+                    'foreignField': '_id',
+                    'as': 'department'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$department',
+                    'preserveNullAndEmptyArrays': true
+                }
+            }, {
+                '$project': {
+                    'department.createdAt': 0,
+                    'department.updatedAt': 0,
+                }
+            }, {
+                $sort: { name: 1 }
+            }
+        ];
+        const classes = await classModel.aggregate(pipeline).exec();
+        return classes;
     }
 
     updateClass(id, data) {
