@@ -1,8 +1,9 @@
 import { body } from "express-validator";
-import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isEmailUsed, isRoleNameExists } from "../common/validators.js";
+import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isDepartmentNameExists, isEmailUsed, isRoleNameExists } from "../common/validators.js";
 import studentService from "../services/student-service.js";
 import classModel from "../models/class-model.js";
 import roleService from "../services/role-service.js";
+import departmentService from "../services/department-service.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -223,4 +224,31 @@ export const validateUpdateRole = [
             })
             return true;
         }).withMessage('Duplicate permissions assigned'),
+];
+
+
+// ***********************FOR-DEPARTMENT-ROUTER************************** //
+export const validateDepartmentCreation = [
+    body('name')
+        .toUpperCase()
+        .notEmpty().withMessage('Department name is required')
+        .custom(async (name) => {
+            const isAlreadyExists = await isDepartmentNameExists(name);
+            if (isAlreadyExists) {
+                throw new Error('Department already exists')
+            }
+            return true;
+        }).withMessage('Department already exists'),
+];
+export const validateDepartmentUpdate = [
+    body('name')
+        .toUpperCase()
+        .notEmpty().withMessage('Department name is required')
+        .custom(async (name, { req }) => {
+            const isAlreadyExists = await departmentService.findByname(name);
+            if (isAlreadyExists && isAlreadyExists?._id.toString() !== req.params.departmentId) {
+                throw new Error('Department already exists')
+            }
+            return true;
+        }).withMessage('Department already exists'),
 ];

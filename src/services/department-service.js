@@ -13,7 +13,7 @@ class DepartmentService {
     }
 
     findAll() {
-        return departmentModel.find({});
+        return departmentModel.find({}).sort({ name: 1 });
     }
 
     findByname(name) {

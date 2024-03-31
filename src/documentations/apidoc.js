@@ -1,24 +1,15 @@
 import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
+import { createDepartmentBody, createDepartmentResponse, deleteDepartmentByIdResponse, getAllDepartmentsResponse, getDepartmentByIdResponse, updateDepartmentByIdResponse } from "./department-docs.js";
 import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
-const apiDocumentation = {
+export const apiDocumentation = {
     openapi: '3.0.1',
     info: {
         version: '1.3.0',
         title: 'College Management System Api Documentation',
         description: 'The College Management System API provides a comprehensive set of endpoints to facilitate the efficient management of various tasks within a college environment. From student enrollment to faculty management, course scheduling, and administrative tasks, this API offers seamless integration and functionality.',
-        //   termsOfService: 'https://mysite.com/terms',
-        //   contact: {
-        //     name: 'Ajay Shekhawat',
-        //     email: 'dev@example.com',
-        //     url: 'https://devwebsite.com',
-        //   },
-        //   license: {
-        //     name: 'Apache 2.0',
-        //     url: 'https://www.apache.org/licenses/LICENSE-2.0.html',
-        //   },
     },
     servers: [
         {
@@ -36,22 +27,22 @@ const apiDocumentation = {
             name: 'Auth',
         },
         {
-            name: 'Employees',
-        },
-        {
             name: 'Students',
         },
         {
             name: 'Classes',
         },
         {
-            name: 'Courses',
-        },
-        {
             name: 'Departments',
         },
         {
             name: 'Roles',
+        },
+        {
+            name: 'Employees',
+        },
+        {
+            name: 'Courses',
         },
     ],
     paths: {
@@ -128,6 +119,22 @@ const apiDocumentation = {
         '/role/delete/{roleId}': {
             delete: deleteRoleByIdResponse,
         },
+        /*-----------------------Departments-Section---------------------------*/
+        '/department/create': {
+            post: createDepartmentResponse,
+        },
+        '/department/get/{departmentId}': {
+            get: getDepartmentByIdResponse,
+        },
+        '/department/getall': {
+            get: getAllDepartmentsResponse,
+        },
+        '/department/update/{departmentId}': {
+            patch: updateDepartmentByIdResponse,
+        },
+        '/department/delete/{departmentId}': {
+            delete: deleteDepartmentByIdResponse,
+        },
     },
     components: {
         securitySchemes: {
@@ -146,8 +153,8 @@ const apiDocumentation = {
             createClassBody,
             /*-----------------------Roles-Section---------------------------*/
             createRoleBody,
+            /*-----------------------Department-Section---------------------------*/
+            createDepartmentBody,
         },
     },
 };
-
-export { apiDocumentation };
