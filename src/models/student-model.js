@@ -46,7 +46,25 @@ const studentSchema = new mongoose.Schema(
         class: {
             type: Types.ObjectId,
             required: true
-        }
+        },
+        photo: {
+            type: String,
+        },
+        bio: {
+            type: String,
+        },
+        idProof: {
+            type: String,
+        },
+        signature: {
+            type: String,
+        },
+        address: {
+            type: Object,
+        },
+        permanentAddress: {
+            type: Object,
+        },
     },
     {
         timestamps: true,
