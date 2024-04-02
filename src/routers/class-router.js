@@ -1,34 +1,20 @@
 import express from "express";
 import authMiddleware from "../middlewares/auth-middlewares.js";
-import { isClassExists } from "../common/validators.js";
+import { isClassNameExists } from "../common/validators.js";
 import { body, validationResult } from "express-validator";
 import roleMiddleware from "../middlewares/role-middleware.js";
 import classService from "../services/class-service.js";
 import { handleException } from "../common/common-helpers.js";
 import { UnprocessableEntityException } from "../exceptions.js";
 import { Types, isValidObjectId } from "mongoose";
-import departmentService from "../services/department-service.js";
+import { validateClassCreation, validateClassUpdate } from "../middlewares/validation-middlewares.js";
 
 const classRouter = express.Router();
 classRouter.use(authMiddleware);
 
-const validateClassCreation = [
-    body('department')
-        .notEmpty().withMessage('Department is required')
-        .isMongoId().withMessage('Must be a valid department'),
-    body('name')
-        .notEmpty().withMessage('Class name is required')
-        .custom(async (name) => {
-            const isAlreadyExists = await isClassExists(name);
-            if (isAlreadyExists) {
-                throw new Error('Class already exists')
-            }
-            return true;
-        }).withMessage('Class already exists'),
-];
-classRouter.post('/create', roleMiddleware.bind(null, 'class.create'), validateClassCreation, async (req, res) => {
+classRouter.post('/create', roleMiddleware.bind(null, 'class.class.create'), validateClassCreation, async (req, res) => {
     try {
-        const errors = validationResult(req);           // Check for validation errors
+        const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ data: null, errors: errors.array() });
         }
@@ -39,16 +25,14 @@ classRouter.post('/create', roleMiddleware.bind(null, 'class.create'), validateC
     }
 });
 
-
-classRouter.get('/get/:classId', async (req, res) => {
+classRouter.get('/get/:classId', roleMiddleware.bind(null, 'class.class.read'), async (req, res) => {
     try {
         let classId = req.params.classId;
-        try {
-            classId = new Types.ObjectId(classId);
-        } catch (error) {
+        const isValidId = isValidObjectId(classId)
+        if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'classId', msg: 'Invalid id' })
         }
-        const result = await classService.findById(classId)
+        const result = await classService.findClassDataById(classId)
         if (result) {
             return res.status(200).json({ data: result, message: 'Class fetched', errors: [] });
         }
@@ -58,18 +42,16 @@ classRouter.get('/get/:classId', async (req, res) => {
     }
 })
 
-
-classRouter.get('/getall', async (req, res) => {
+classRouter.get('/getall', roleMiddleware.bind(null, 'class.class.read'), async (req, res) => {
     try {
-        const classes = await classService.findAll();
+        const classes = await classService.findAllClassesData();
         return res.status(200).json({ data: classes, message: 'Classes fetched', errors: [] });
     } catch (error) {
         return handleException(res, 'Failed to fetch classes', error);
     }
 })
 
-
-classRouter.get('/get-by-department/:departmentId', async (req, res) => {
+classRouter.get('/get-by-department/:departmentId', roleMiddleware.bind(null, 'class.class.read'), async (req, res) => {
     try {
         let departmentId = req.params.departmentId;
         const isValidId = isValidObjectId(departmentId)
@@ -83,16 +65,7 @@ classRouter.get('/get-by-department/:departmentId', async (req, res) => {
     }
 })
 
-
-const validateClassUpdate = [
-    body('name')
-        .notEmpty().withMessage('Class name is required'),
-    body('department')
-        .optional()
-        .notEmpty().withMessage('Department is required')
-        .isMongoId().withMessage('Department must be valid')
-];
-classRouter.patch('/update/:classId', validateClassUpdate, async (req, res) => {
+classRouter.patch('/update/:classId', roleMiddleware.bind(null, 'class.class.updates'), validateClassUpdate, async (req, res) => {
     try {
         const errors = validationResult(req);           // Check for validation errors
         if (!errors.isEmpty()) {
@@ -103,35 +76,30 @@ classRouter.patch('/update/:classId', validateClassUpdate, async (req, res) => {
         if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'classId', msg: 'Invalid id' })
         }
-        const result = await classService.findByName(req.body.name)
-        if (result && result._id.toString() !== classId.toString()) {
-            throw new UnprocessableEntityException({ path: 'name', msg: 'Class already exists' })
-        }
         const updatedClass = await classService.updateClass(classId.toString(), req.body);
         if (!updatedClass) {
             return res.status(404).json({ data: null, message: 'Class not found', errors: 'Class not found' });
         }
-        res.status(202).json({ data: updatedClass, message: 'Class updated', errors: [] });
+        return res.status(202).json({ data: updatedClass, message: 'Class updated', errors: [] });
     } catch (error) {
-        handleException(res, 'Failed to update Class', error);
+        return handleException(res, 'Failed to update Class', error);
     }
 })
 
-
-classRouter.delete('/delete/:classId', async (req, res) => {
+classRouter.delete('/delete/:classId', roleMiddleware.bind(null, 'class.class.delete'), async (req, res) => {
     try {
         let classId = req.params.classId;
         const isValidId = isValidObjectId(classId)
         if (!isValidId) {
             throw new UnprocessableEntityException({ path: 'classId', msg: 'Invalid id' })
-        }        
+        }
         const result = await classService.deleteClass(classId);
         if (result) {
-            res.status(202).json({ data: result, message: 'Class deleted', errors: [] });
+            return res.status(202).json({ data: null, message: 'Class deleted', errors: [] });
         }
-        res.status(404).json({ data: null, message: 'Class not found', errors: 'Class not found' });
+        return res.status(404).json({ data: null, message: 'Class not found', errors: 'Class not found' });
     } catch (error) {
-        handleException(res, 'Failed to delete Class', error);
+        return handleException(res, 'Failed to delete Class', error);
     }
 })
 

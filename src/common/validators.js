@@ -3,9 +3,15 @@ import courseService from "../services/course-service.js";
 import departmentService from "../services/department-service.js";
 import roleService from "../services/role-service.js";
 import studentService from "../services/student-service.js";
+import employeeService from "../services/employee-service.js";
 
 export const isEmailUsed = async (email) => {
     const existingStudent = await studentService.findByEmail(email);
+    return existingStudent ? true : false;
+}
+
+export const isEmployeeEmailUsed = async (email) => {
+    const existingStudent = await employeeService.findByEmail(email);
     return existingStudent ? true : false;
 }
 
@@ -19,12 +25,17 @@ export const isDepartmentIdExists = async (id) => {
     return existingDepartment ? true : false;
 }
 
-export const isClassExists = async (name) => {
+export const isClassNameExists = async (name) => {
     const existingClass = await classService.findByName(name)
     return existingClass ? true : false;
 }
 
-export const isRoleExists = async (name) => {
+export const isClassIdExists = async (id) => {
+    const existingClass = await classService.findById(id)
+    return existingClass ? true : false;
+}
+
+export const isRoleNameExists = async (name) => {
     const existingRole = await roleService.findByname(name)
     return existingRole ? true : false;
 }
