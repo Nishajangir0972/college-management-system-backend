@@ -1,3 +1,4 @@
+import { ConfigData } from "../config/config.js";
 import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
 import { createDepartmentBody, createDepartmentResponse, deleteDepartmentByIdResponse, getAllDepartmentsResponse, getDepartmentByIdResponse, updateDepartmentByIdResponse } from "./department-docs.js";
@@ -18,10 +19,10 @@ export const apiDocumentation = {
             url: 'http://localhost:8000/',
             description: 'Local Server',
         },
-        //   {
-        //     url: 'https://api.mysite.com',
-        //     description: 'Production Server',
-        //   },
+          {
+            url: `${ConfigData.production.live_dsn}`,
+            description: 'Production Server',
+          },
     ],
     apis: ['../index.js'],
     tags: [

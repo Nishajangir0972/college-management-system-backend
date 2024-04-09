@@ -27,5 +27,8 @@ export const ConfigData = {
     // },
     frontend: {
         baseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:3000'
+    },
+    production: {
+        live_dsn: process.env.LIVE_PRODUCTION_URL || ''
     }
 }
