@@ -40,6 +40,11 @@ export const isRoleNameExists = async (name) => {
     return existingRole ? true : false;
 }
 
+export const isRoleIdExists = async (name) => {
+    const existingRole = await roleService.findById(name)
+    return existingRole ? true : false;
+}
+
 export const isCourseNameExists = async (name) => {
     const existingCourse = await courseService.findByName(name)
     return existingCourse ? true : false;

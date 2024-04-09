@@ -14,7 +14,7 @@ const employeeSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        fName: {
+        fathersName: {
             type: String,
         },
         email: {
@@ -26,11 +26,11 @@ const employeeSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        mobile1: {
+        mobile: {
             type: Number,
             required: true,
         },
-        mobile2: {
+        alternativeMobile: {
             type: Number,
         },
         dob: {
@@ -38,7 +38,6 @@ const employeeSchema = new mongoose.Schema(
         },
         department: {
             type: Types.ObjectId,
-            required: true
         },
         photo: {
             type: String,
@@ -54,7 +53,7 @@ const employeeSchema = new mongoose.Schema(
         },
         designation: {
             type: Types.ObjectId,
-            required: true
+            // required: true
         },
         address: {
             type: Object,
