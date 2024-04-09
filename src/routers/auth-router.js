@@ -37,7 +37,7 @@ authRouter.post('/student/login',
                 if (!validPassword) {
                     throw new UnauthorisedException({ path: 'password', msg: 'Incorrect password' });
                 }
-                const token = createJwtToken({ id: student._id, name: student.firstName, username: student.username, role: student.role })
+                const token = createJwtToken({ id: student._id, name: student.firstName, username: student.username, role: student.role, isEmployee: false })
                 return res
                     .status(200)
                     .json({ message: 'Loggin successful', data: { token, tokenType: 'Bearer Token', expiresIn: `${ConfigData.auth.jwt.accessTokenExpiry}s` }, errors: [] })
@@ -74,7 +74,7 @@ authRouter.post('/employee/login',
                 if (!validPassword) {
                     throw new UnauthorisedException({ path: 'password', msg: 'Incorrect password' });
                 }
-                const token = createJwtToken({ id: employee._id, name: employee.firstName, username: employee.username, role: employee.role })
+                const token = createJwtToken({ id: employee._id, name: employee.firstName, username: employee.username, role: employee.role, isEmployee: true })
                 return res
                     .status(200)
                     .json({ message: 'Loggin successful', data: { token, tokenType: 'Bearer Token', expiresIn: `${ConfigData.auth.jwt.accessTokenExpiry}s` }, errors: [] })
@@ -185,7 +185,7 @@ authRouter.post(
                     .json({ data: null, errors: errors.array() });
             }
             const user = await employeeService.findByEmail(req.body.email);
-            const generatedToken = await userTokenService.saveToken(user._id.toString(), userTokenTypes.RESET_PASSWORD );
+            const generatedToken = await userTokenService.saveToken(user._id.toString(), userTokenTypes.RESET_PASSWORD);
             try {
                 await sendEmail(user.email, 'Reset-Password', 'reset-password', { name: user.firstName, resetPasswordLink: `${ConfigData.frontend.baseUrl}/employee/reset-password/${generatedToken.token}` })
                 res.status(200).json({ data: null, message: 'Password reset email sent', errors: [] })
@@ -233,7 +233,7 @@ authRouter.post(
             await userTokenService.delete(token);
             return res
                 .status(202)
-                .json({ data: null, message: 'Password Successfully Updated', errors: []  });
+                .json({ data: null, message: 'Password Successfully Updated', errors: [] });
         }
         catch (error) {
             handleException(res, 'Request Failed', error);

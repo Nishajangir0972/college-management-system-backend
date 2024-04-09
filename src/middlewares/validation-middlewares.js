@@ -5,6 +5,7 @@ import classModel from "../models/class-model.js";
 import roleService from "../services/role-service.js";
 import departmentService from "../services/department-service.js";
 import employeeService from "../services/employee-service.js";
+import { comparePasswords } from "../common/utils.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -337,3 +338,87 @@ export const validateEmployeeUpdate = [
             return true;
         }).withMessage(`Role doesn't exists`),
 ];
+
+
+// ***********************FOR-PROFILE-ROUTER************************** //
+export const validateProfileUpdate = [
+    body('mobile')
+        .optional()
+        .isNumeric().withMessage('Mobile must be a number')
+        .notEmpty().withMessage('Mobile Number is required'),
+    body('alternativeMobile')
+        .optional()
+        .isNumeric().withMessage('Mobile must be a number'),
+    body('username')
+        .optional()
+        .custom(async (username, { req }) => {
+            if (req.user.isEmployee) {
+                const isUsed = await employeeService.findByUsername(username);
+                if (isUsed && isUsed?._id?.toString() !== req.user.id.toString()) {
+                    throw new Error('Username is already taken');
+                }
+            }
+            else {
+                const isUsed = await studentService.findByUsername(username);
+                if (isUsed && isUsed?._id?.toString() !== req.user.id.toString()) {
+                    throw new Error('Username is already taken');
+                }
+            }
+            return true;
+        }).withMessage('Username is already taken')
+        .notEmpty().withMessage('Username cant be empty'),
+    body('email')
+        .optional()
+        .isEmail().withMessage('Invalid email format')
+        .custom(async (email, { req }) => {
+            if (req.user.isEmployee) {
+                const isUsed = await employeeService.findByEmail(email);
+                if (isUsed && isUsed?._id?.toString() !== req.user.id.toString()) {
+                    throw new Error('Email is already taken');
+                }
+            }
+            else {
+                const isUsed = await studentService.findByEmail(email);
+                if (isUsed && isUsed?._id?.toString() !== req.user.id.toString()) {
+                    throw new Error('Email is already taken');
+                }
+            }
+            return true;
+        }).withMessage('Email is already taken')
+        .notEmpty().withMessage('Email is required'),
+    body('bio')
+        .optional(),
+];
+
+export const validateChangePassword = [
+    body('password')
+        .custom(async (password, { req }) => {
+            if (req.user.isEmployee) {
+                const employee = await employeeService.findById(req.user.id);
+                const isCorrectPassword = await comparePasswords(password, employee.password);
+                if (!isCorrectPassword) {
+                    throw new Error('Incorrect Password');
+                }
+            }
+            else {
+                const student = await studentService.findById(req.user.id);
+                const isCorrectPassword = await comparePasswords(password, student.password);
+                if (!isCorrectPassword) {
+                    throw new Error('Incorrect Password');
+                }
+            }
+            return true;
+        }).withMessage('Incorrect Password')
+        .notEmpty().withMessage('Password cannot be empty'),
+    body('newPassword').notEmpty().withMessage('New password cannot be empty'),
+    body('cnfPassword').notEmpty().withMessage('Confirm password must not be empty'),
+    body('cnfPassword').custom((inp, meta) => {
+        if (
+            meta.req.body.newPassword
+            && meta.req.body.cnfPassword
+            && meta.req.body.newPassword !== meta.req.body.cnfPassword) {
+            return false;
+        }
+        return true;
+    }).withMessage('Confirm Password must be similar to new password')
+]
