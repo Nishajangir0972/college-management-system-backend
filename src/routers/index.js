@@ -6,6 +6,7 @@ import roleRouter from "./role-router.js";
 import departmentRouter from "./department-router.js";
 import classRouter from "./class-router.js";
 import courseRouter from "./course-router.js";
+import profileRouter from "./profile.router.js";
 
 const mainRouter = express.Router();
 
@@ -16,6 +17,7 @@ mainRouter.use('/role', roleRouter);
 mainRouter.use('/department', departmentRouter);
 mainRouter.use('/class', classRouter);
 mainRouter.use('/courses', courseRouter);
+mainRouter.use('/profile', profileRouter);
 // Use other routers as needed
 
 export default mainRouter;

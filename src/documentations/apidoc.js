@@ -2,6 +2,7 @@ import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePa
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
 import { createDepartmentBody, createDepartmentResponse, deleteDepartmentByIdResponse, getAllDepartmentsResponse, getDepartmentByIdResponse, updateDepartmentByIdResponse } from "./department-docs.js";
 import { createEmployeeBody, createEmployeeResponse, deleteEmployeeByIdResponse, getAllEmployeesResponse, getEmployeeByIdResponse, updateEmployeeByIdResponse, updateEmployeeDataByIdBody } from "./employee-docs.js";
+import { changePasswordBody, changePasswordResponse, getProfileResponse, updateProfileBody, updateProfileResponse } from "./profile-docs.js";
 import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
@@ -41,6 +42,9 @@ export const apiDocumentation = {
         },
         {
             name: 'Employees',
+        },
+        {
+            name: 'Profile',
         },
         {
             name: 'Courses',
@@ -136,8 +140,8 @@ export const apiDocumentation = {
         '/department/delete/{departmentId}': {
             delete: deleteDepartmentByIdResponse,
         },
-         /*-----------------------Employee-Section---------------------------*/
-         '/employee/create': {
+        /*-----------------------Employee-Section---------------------------*/
+        '/employee/create': {
             post: createEmployeeResponse,
         },
         '/employee/get/{employeeId}': {
@@ -149,8 +153,18 @@ export const apiDocumentation = {
         '/employee/update/{employeeId}': {
             patch: updateEmployeeByIdResponse,
         },
-        '/employee/delete/{employeeId':{
-          delete: deleteEmployeeByIdResponse,
+        '/employee/delete/{employeeId': {
+            delete: deleteEmployeeByIdResponse,
+        },
+        /*-----------------------Profile-Section---------------------------*/
+        '/profile': {
+            get: getProfileResponse,
+        },
+        '/profile/update': {
+            post: updateProfileResponse,
+        },
+        '/profile/change-password': {
+            post: changePasswordResponse,
         },
     },
     components: {
@@ -173,7 +187,9 @@ export const apiDocumentation = {
             /*-----------------------Department-Section---------------------------*/
             createDepartmentBody,
             /*-----------------------Employee-Section---------------------------*/
-            createEmployeeBody,updateEmployeeDataByIdBody,
+            createEmployeeBody, updateEmployeeDataByIdBody,
+            /*-----------------------Profile-Section---------------------------*/
+            updateProfileBody, changePasswordBody,
         },
     },
 };
