@@ -1,6 +1,7 @@
 import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePasswordResetRequestResponse, employeePasswordResetResponse, passwordResetRequestBody, resetPasswordBody, studentLoginResponse, studentPasswordResetRequestResponse, studentPasswordResetResponse } from "./auth-docs.js";
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
 import { createDepartmentBody, createDepartmentResponse, deleteDepartmentByIdResponse, getAllDepartmentsResponse, getDepartmentByIdResponse, updateDepartmentByIdResponse } from "./department-docs.js";
+import { createEmployeeBody, createEmployeeResponse, deleteEmployeeByIdResponse, getAllEmployeesResponse, getEmployeeByIdResponse, updateEmployeeByIdResponse, updateEmployeeDataByIdBody } from "./employee-docs.js";
 import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
 
@@ -135,6 +136,22 @@ export const apiDocumentation = {
         '/department/delete/{departmentId}': {
             delete: deleteDepartmentByIdResponse,
         },
+         /*-----------------------Employee-Section---------------------------*/
+         '/employee/create': {
+            post: createEmployeeResponse,
+        },
+        '/employee/get/{employeeId}': {
+            get: getEmployeeByIdResponse,
+        },
+        '/employee/getall': {
+            get: getAllEmployeesResponse,
+        },
+        '/employee/update/{employeeId}': {
+            patch: updateEmployeeByIdResponse,
+        },
+        '/employee/delete/{employeeId':{
+          delete: deleteEmployeeByIdResponse,
+        },
     },
     components: {
         securitySchemes: {
@@ -155,6 +172,8 @@ export const apiDocumentation = {
             createRoleBody,
             /*-----------------------Department-Section---------------------------*/
             createDepartmentBody,
+            /*-----------------------Employee-Section---------------------------*/
+            createEmployeeBody,updateEmployeeDataByIdBody,
         },
     },
 };

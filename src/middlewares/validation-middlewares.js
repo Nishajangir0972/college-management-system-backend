@@ -1,9 +1,10 @@
 import { body } from "express-validator";
-import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isDepartmentNameExists, isEmailUsed, isRoleNameExists } from "../common/validators.js";
+import { isClassIdExists, isClassNameExists, isCourseNameExists, isDepartmentIdExists, isDepartmentNameExists, isEmailUsed, isEmployeeEmailUsed, isRoleIdExists, isRoleNameExists } from "../common/validators.js";
 import studentService from "../services/student-service.js";
 import classModel from "../models/class-model.js";
 import roleService from "../services/role-service.js";
 import departmentService from "../services/department-service.js";
+import employeeService from "../services/employee-service.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -251,4 +252,88 @@ export const validateDepartmentUpdate = [
             }
             return true;
         }).withMessage('Department already exists'),
+];
+
+
+// ***********************FOR-EMPLOYEE-ROUTER************************** //
+export const validateEmployeeCreation = [
+    body('firstName')
+        .notEmpty().withMessage('First name is required'),
+    body('mobile')
+        .notEmpty().withMessage('Mobile Number is required')
+        .isNumeric().withMessage('Mobile must be a number'),
+    body('email')
+        .notEmpty().withMessage('Email is required')
+        .isEmail().withMessage('Invalid email format')
+        .custom(async (email) => {
+            const isUsed = await isEmployeeEmailUsed(email);
+            if (isUsed) {
+                throw new Error('Email is already taken');
+            }
+            return true;
+        }).withMessage('Email is already taken'),
+    body('department')
+        .notEmpty().withMessage('Department is required')
+        .isMongoId().withMessage('Must be a valid department')
+        .custom(async (value) => {
+            const departmentExists = await isDepartmentIdExists(value);
+            if (!departmentExists) {
+                throw new Error('Department doesnt exists');
+            }
+            return true;
+        }).withMessage(`Department doesn't exists`),
+    body('role')
+        .notEmpty().withMessage('Role is required')
+        .isMongoId().withMessage('Must be a valid role')
+        .custom(async (value) => {
+            const roleExists = await isRoleIdExists(value);
+            if (!roleExists) {
+                throw new Error('Role doesnt exists');
+            }
+            return true;
+        }).withMessage(`Role doesn't exists`),
+];
+
+export const validateEmployeeUpdate = [
+    body('firstName')
+        .optional()
+        .notEmpty()
+        .withMessage('First name is required'),
+    body('mobile')
+        .optional()
+        .isNumeric().withMessage('Mobile must be a number')
+        .notEmpty().withMessage('Mobile Number is required'),
+    body('email')
+        .optional()
+        .isEmail().withMessage('Invalid email format')
+        .notEmpty().withMessage('Email is required')
+        .custom(async (email, { req }) => {
+            const isUsed = await employeeService.findByEmail(email);
+            if (isUsed && isUsed?._id.toString() !== req.params.employeeId) {
+                throw new Error('Email is already taken');
+            }
+            return true;
+        }).withMessage('Email is already taken'),
+    body('department')
+        .optional()
+        .isMongoId().withMessage('Must be a valid department')
+        .notEmpty().withMessage('Department is required')
+        .custom(async (value) => {
+            const departmentExists = await isDepartmentIdExists(value);
+            if (!departmentExists) {
+                throw new Error('Department doesnt exists');
+            }
+            return true;
+        }).withMessage(`Department doesn't exists`),
+    body('role')
+        .optional()
+        .isMongoId().withMessage('Must be a valid role')
+        .notEmpty().withMessage('Role is required')
+        .custom(async (value) => {
+            const roleExists = await isRoleIdExists(value);
+            if (!roleExists) {
+                throw new Error('Role doesnt exists');
+            }
+            return true;
+        }).withMessage(`Role doesn't exists`),
 ];
