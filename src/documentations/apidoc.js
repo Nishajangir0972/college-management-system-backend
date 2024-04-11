@@ -2,6 +2,7 @@ import { AuthEmployeeLoginBody, AuthLoginBody, employeeLoginResponse, employeePa
 import { createClassBody, createClassResponse, deleteClassByIdResponse, getAllClassesByDepartmentResponse, getAllClassesResponse, getClassByIdResponse, updateClassByIdResponse } from "./class-docs.js";
 import { createDepartmentBody, createDepartmentResponse, deleteDepartmentByIdResponse, getAllDepartmentsResponse, getDepartmentByIdResponse, updateDepartmentByIdResponse } from "./department-docs.js";
 import { createEmployeeBody, createEmployeeResponse, deleteEmployeeByIdResponse, getAllEmployeesResponse, getEmployeeByIdResponse, updateEmployeeByIdResponse, updateEmployeeDataByIdBody } from "./employee-docs.js";
+import { addNewExamResponse, createExamBody, deleteExamByIdResponse, getAllExamsBySessionResponse, getAllExamsResponse, getExamByIdResponse, updateExamByIdResponse } from "./exams-docs.js";
 import { changePasswordBody, changePasswordResponse, getProfileResponse, updateProfileBody, updateProfileResponse } from "./profile-docs.js";
 import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
@@ -45,6 +46,9 @@ export const apiDocumentation = {
         },
         {
             name: 'Profile',
+        },
+        {
+            name: 'Exams',
         },
         {
             name: 'Courses',
@@ -153,7 +157,7 @@ export const apiDocumentation = {
         '/employee/update/{employeeId}': {
             patch: updateEmployeeByIdResponse,
         },
-        '/employee/delete/{employeeId': {
+        '/employee/delete/{employeeId}': {
             delete: deleteEmployeeByIdResponse,
         },
         /*-----------------------Profile-Section---------------------------*/
@@ -165,6 +169,28 @@ export const apiDocumentation = {
         },
         '/profile/change-password': {
             post: changePasswordResponse,
+        },
+        /*-----------------------Exams-Section---------------------------*/
+        '/exams/add-new': {
+            post: addNewExamResponse,
+        },
+        '/exams/get/{examId}': {
+            get: getExamByIdResponse,
+        },
+        '/exams/getall': {
+            get: getAllExamsResponse,
+        },
+        '/exams/getall/{session}': {
+            get: getAllExamsBySessionResponse,
+        },
+        // '/class/get-by-department/{departmentId}': {
+        //     get: getAllClassesByDepartmentResponse,
+        // },
+        '/exams/update/{examId}': {
+            patch: updateExamByIdResponse,
+        },
+        '/exams/delete/{examId}': {
+            delete: deleteExamByIdResponse,
         },
     },
     components: {
@@ -190,6 +216,8 @@ export const apiDocumentation = {
             createEmployeeBody, updateEmployeeDataByIdBody,
             /*-----------------------Profile-Section---------------------------*/
             updateProfileBody, changePasswordBody,
+            /*-----------------------Exam-Section---------------------------*/
+            createExamBody,
         },
     },
 };
