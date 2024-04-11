@@ -13,15 +13,14 @@ export const handleException = (res, message, error) => {
 };
 
 export const getPaginationQuery = (query) => {
-    let { page = 1, limit = 50, sort = [{ field: 'createdAt', direction: 1 }] } = query;
-    console.log('-------------sort',sort);
+    let { page = 1, limit = 50, sort = [{ field: 'createdAt', direction: -1 }] } = query;
     if (sort) {
         sort.map((sortObject) => {
             if (!sortObject.field || !sortObject.direction) {
                 throw new UnprocessableEntityException('Invalid query passed')
             }
         })
-        sort = [{ field: 'createdAt', direction: 1 }]
+        // sort = [{ field: 'createdAt', direction: 1 }]
     }
     page = Number(page);
     limit = Number(limit);

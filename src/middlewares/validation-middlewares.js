@@ -6,6 +6,7 @@ import roleService from "../services/role-service.js";
 import departmentService from "../services/department-service.js";
 import employeeService from "../services/employee-service.js";
 import { comparePasswords } from "../common/utils.js";
+import examsService from "../services/exams-service.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -422,3 +423,62 @@ export const validateChangePassword = [
         return true;
     }).withMessage('Confirm Password must be similar to new password')
 ]
+
+
+// ***********************FOR-EXAMS-ROUTER************************** //
+export const validateAddNewExam = [
+    body('name')
+        .custom(async (name, { req }) => {
+            const isExamExists = await examsService.findOneByNameAndSession(name, req.body.session);
+            if (isExamExists) {
+                throw new Error('Exam already exists in this session')
+            }
+            return true;
+        }).withMessage('Exam already exists in this session')
+        .notEmpty().withMessage('Name is required'),
+    body('session')
+        .custom(async (session) => {
+            const sessionPattern = /^\d{4}-\d{4}$/;
+            // Check if session string matches the pattern
+            if (!sessionPattern.test(session)) {
+                throw new Error('Invalid session format');
+            }
+            const [startYear, endYear] = session.split('-').map(Number);
+            if (startYear > endYear || endYear - startYear > 1) {
+                throw new Error('Invalid session range');
+            }
+            return true;
+        })
+        .withMessage('Valid session example 2020-2021')
+        .notEmpty().withMessage('Session could not be empty')
+];
+
+export const validateExamUpdate = [
+    body('name')
+        .optional()
+        .custom(async (name, { req }) => {
+            const exam = await examsService.findById(req.params.examId);
+            const isExamExists = await examsService.findOneByNameAndSession(name, req.body.session ? req.body.session : exam.session);
+            if (isExamExists && isExamExists._id.toString() !== req.params.examId) {
+                throw new Error('Exam already exists in this session')
+            }
+            return true;
+        }).withMessage('Exam already exists in this session')
+        .notEmpty().withMessage('Name is required'),
+    body('session')
+        .optional()
+        .custom(async (session) => {
+            const sessionPattern = /^\d{4}-\d{4}$/;
+            // Check if session string matches the pattern
+            if (!sessionPattern.test(session)) {
+                throw new Error('Invalid session format');
+            }
+            const [startYear, endYear] = session.split('-').map(Number);
+            if (startYear > endYear || endYear - startYear > 1) {
+                throw new Error('Invalid session range');
+            }
+            return true;
+        })
+        .withMessage('Valid session example 2020-2021')
+        .notEmpty().withMessage('Session could not be empty')
+];
