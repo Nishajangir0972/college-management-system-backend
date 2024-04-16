@@ -7,6 +7,8 @@ import departmentService from "../services/department-service.js";
 import employeeService from "../services/employee-service.js";
 import { comparePasswords } from "../common/utils.js";
 import examsService from "../services/exams-service.js";
+import classService from "../services/class-service.js";
+import subjectService from "../services/subject-service.js";
 
 // ***********************FOR-Students-ROUTER************************** //
 export const validateStudentCreation = [
@@ -481,4 +483,62 @@ export const validateExamUpdate = [
         })
         .withMessage('Valid session example 2020-2021')
         .notEmpty().withMessage('Session could not be empty')
+];
+
+
+
+// ***********************FOR-Subjects-ROUTER************************** //
+export const validateAddNewSubject = [
+    body('name')
+        .custom(async (name, { req }) => {
+            const isSubjectExists = await subjectService.findOneByNameAndClass(name, req.body.class);
+            if (isSubjectExists) {
+                throw new Error('Subject already exists in this class')
+            }
+            return true;
+        }).withMessage('Subject already exists in this class')
+        .notEmpty().withMessage('Name is required'),
+    body('description')
+        .optional()
+        .notEmpty().withMessage('Name is required'),
+    body('class')
+        .isMongoId().withMessage('Class must be valid')
+        .custom(async (data) => {
+            const isValidClass = await classService.findById(data)
+            if (!isValidClass) {
+                throw new Error('Class does not exists')
+            }
+            return true;
+        })
+        .withMessage('Class does not exists')
+        .notEmpty().withMessage('Class could not be empty')
+];
+
+export const validateSubjectUpdate = [
+    body('name')
+        .optional()
+        .custom(async (name, { req }) => {
+            const subject = await subjectService.findById(req.params.subjectId)
+            const isSubjectExists = await subjectService.findOneByNameAndClass(name, req.body.class ? req.body.class : subject.class);
+            if (isSubjectExists) {
+                throw new Error('Subject already exists in this class')
+            }
+            return true;
+        }).withMessage('Subject already exists in this class')
+        .notEmpty().withMessage('Name is required'),
+    body('description')
+        .optional()
+        .notEmpty().withMessage('Name is required'),
+    body('class')
+        .optional()
+        .isMongoId().withMessage('Class must be valid')
+        .custom(async (data) => {
+            const isValidClass = await classService.findById(data)
+            if (!isValidClass) {
+                throw new Error('Class does not exists')
+            }
+            return true;
+        })
+        .withMessage('Class does not exists')
+        .notEmpty().withMessage('Class could not be empty')
 ];

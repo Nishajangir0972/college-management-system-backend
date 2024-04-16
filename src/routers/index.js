@@ -8,6 +8,7 @@ import classRouter from "./class-router.js";
 import courseRouter from "./course-router.js";
 import profileRouter from "./profile.router.js";
 import examRouter from "./exams-router.js";
+import subjectRouter from "./subject-router.js";
 
 const mainRouter = express.Router();
 
@@ -20,6 +21,7 @@ mainRouter.use('/class', classRouter);
 mainRouter.use('/courses', courseRouter);
 mainRouter.use('/profile', profileRouter);
 mainRouter.use('/exams', examRouter);
+mainRouter.use('/subject', subjectRouter);
 // Use other routers as needed
 
 export default mainRouter;
