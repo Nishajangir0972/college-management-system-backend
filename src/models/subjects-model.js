@@ -19,8 +19,8 @@ const subjectSchema = new mongoose.Schema({
     versionKey: false
 });
 
+
 subjectSchema.index({ name: 1, class: 1 }, { unique: true });
+const SubjectModel = mongoose.model('subjects', subjectSchema);
 
-const Subject = mongoose.model('subjects', subjectSchema);
-
-export default Subject;
+export default SubjectModel;

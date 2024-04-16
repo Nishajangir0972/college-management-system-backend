@@ -7,6 +7,7 @@ import { addNewExamResponse, createExamBody, deleteExamByIdResponse, getAllExams
 import { changePasswordBody, changePasswordResponse, getProfileResponse, updateProfileBody, updateProfileResponse } from "./profile-docs.js";
 import { createRoleBody, createRoleResponse, deleteRoleByIdResponse, getAllRolesResponse, getRoleByIdResponse, getSelfPermissionsResponse, updateRoleByIdResponse } from "./roles-docs.js";
 import { createStudentBody, createStudentResponse, deleteStudentByIdResponse, getAllStudentsResponse, getStudentByIdResponse, updateStudentByIdResponse, updateStudentDataByIdBody } from "./student-docs.js";
+import { addNewSubjectResponse, createSubjectBody, deleteSubjectByIdResponse, getAllSubjectsByClassResponse, getAllSubjectsResponse, getSubjectByIdResponse, updateSubjectByIdResponse } from "./subject-docs.js";
 
 export const apiDocumentation = {
     openapi: '3.0.1',
@@ -184,14 +185,30 @@ export const apiDocumentation = {
         '/exams/getall/{session}': {
             get: getAllExamsBySessionResponse,
         },
-        // '/class/get-by-department/{departmentId}': {
-        //     get: getAllClassesByDepartmentResponse,
-        // },
         '/exams/update/{examId}': {
             patch: updateExamByIdResponse,
         },
         '/exams/delete/{examId}': {
             delete: deleteExamByIdResponse,
+        },
+        /*-----------------------Subjects-Section---------------------------*/
+        '/subject/add-new': {
+            post: addNewSubjectResponse,
+        },
+        '/subject/get/{subjectId}': {
+            get: getSubjectByIdResponse,
+        },
+        '/subject/getall': {
+            get: getAllSubjectsResponse,
+        },
+        '/subject/getall/{classId}': {
+            get: getAllSubjectsByClassResponse,
+        },
+        '/subject/update/{subjectId}': {
+            patch: updateSubjectByIdResponse,
+        },
+        '/subject/delete/{subjectId}': {
+            delete: deleteSubjectByIdResponse,
         },
     },
     components: {
@@ -219,6 +236,8 @@ export const apiDocumentation = {
             updateProfileBody, changePasswordBody,
             /*-----------------------Exam-Section---------------------------*/
             createExamBody,
+            /*-----------------------Subjects-Section---------------------------*/
+            createSubjectBody,
         },
     },
 };
